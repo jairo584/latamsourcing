@@ -1,14 +1,22 @@
-# latamsourcing
-# 1. Clona el repositorio recién creado
-git clone git@github.com:TU_USUARIO/latam-github-sourcing.git
-cd latam-github-sourcing
+import requests, csv
 
-# 2. Crea un entorno y un requirements.txt
-python3 -m venv venv
-source venv/bin/activate
-pip install requests
-pip freeze > requirements.txt
+TOKEN = "TU_GITHUB_TOKEN"
+HEADERS = { "Authorization": f"token {TOKEN}" }
+paises = ["Argentina", "Bolivia", ..., "Venezuela"]
 
-# 3. Crea la carpeta de scripts y añade tu código
-mkdir src
-# Abre tu editor y guarda el script como src/sourcing_latam.py
+with open("latam_recruited.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["pais", "login", "url", "followers"])
+    for pais in paises:
+        for page in range(1, 6):  # ajusta pages si necesitas más
+            params = {
+                "q": f'location:"{pais}"',
+                "per_page": 100,
+                "page": page
+            }
+            res = requests.get("https://api.github.com/search/users",
+                               headers=HEADERS, params=params)
+            items = res.json().get("items", [])
+            if not items: break
+            for u in items:
+                writer.writerow([pais, u["login"], u["html_url"], u["followers"]])
